@@ -1,0 +1,25 @@
+{
+  "name": "cursor--project",
+  "version": "1.0.0",
+  "description": "Cursor project for learning",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gonzalojaviermuller/Cursor--project.git"
+  },
+  "keywords": [],
+  "author": "Gonzalo Muller",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gonzalojaviermuller/Cursor--project/issues"
+  },
+  "homepage": "https://github.com/gonzalojaviermuller/Cursor--project#readme",
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "express": "^4.21.2"
+  }
+}

@@ -1,4 +1,5 @@
 import { getDatabase } from '../databases/database.js';
+import bcrypt from 'bcryptjs';
 
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -10,7 +11,7 @@ function isValidPassword(password) {
            password.trim().length >= 6;
 }
 
-export function createUser(userData) {
+export async function createUser(userData) {
     const { email, password } = userData;
 
     // Validate email
@@ -29,11 +30,15 @@ export function createUser(userData) {
         throw new Error('Password must be at least 6 characters long');
     }
 
+    // Hash password before storing
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const stmt = getDatabase().prepare(
         'INSERT INTO users (email, password) VALUES (?, ?)'
     );
     
-    const result = stmt.run(email.trim(), password);
+    const result = stmt.run(email.trim(), hashedPassword);
     
     return {
         id: result.lastInsertRowid,
@@ -49,4 +54,26 @@ export function findUserByEmail(email) {
     
     const stmt = getDatabase().prepare('SELECT * FROM users WHERE email = ?');
     return stmt.get(email.trim()) || null;
+}
+
+export async function verifyUserCredentials(email, password) {
+    if (!email || !password) {
+        return null;
+    }
+
+    const user = findUserByEmail(email);
+    if (!user) {
+        return null;
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+        return null;
+    }
+
+    return {
+        id: user.id,
+        email: user.email,
+        createdAt: user.created_at
+    };
 }

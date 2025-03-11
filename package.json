@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/gonzalojaviermuller/Cursor--project#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "better-sqlite3": "^11.8.1",
     "express": "^4.21.2"
   }

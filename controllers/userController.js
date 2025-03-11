@@ -1,6 +1,6 @@
 import { createUser, findUserByEmail } from '../models/user.js';
 
-export function signup(req, res) {
+export async function signup(req, res) {
     const { email, password } = req.body;
 
     //check if email and password are not empty or just white spaces
@@ -26,9 +26,9 @@ export function signup(req, res) {
     }
 
     try {
-        const newUser = createUser({ email, password });
+        const newUser = await createUser({ email, password });
         res.status(201).json({
-        message: 'User created successfully',
+        message: `User created successfully`,
         user: newUser
     });
     } catch (error) {
@@ -36,7 +36,7 @@ export function signup(req, res) {
     }
 }
 
-export function login(req, res) {
+export async function login(req, res) {
     const { email, password } = req.body;
 
     //check if email and password are not empty or just white spaces
@@ -44,19 +44,21 @@ export function login(req, res) {
         return res.status(400).json({ message: 'Email and password are required and cannot be empty' });
     }
 
-    // Find user
-    const user = findUserByEmail(email);
-    
-    // Check if user exists and password matches
-    if (!user || user.password !== password) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    res.status(200).json({
-        message: 'Login successful',
-        user: {
-            id: user.id,
-            email: user.email
+    try {
+        const user = await verifyUserCredentials(email, password);
+        
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
-    });
+
+        res.status(200).json({
+            message: 'Login successful',
+            user: {
+                id: user.id,
+                email: user.email
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred during login' });
+    }
 }

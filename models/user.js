@@ -30,7 +30,7 @@ export async function createUser(userData) {
         throw new Error('Password must be at least 6 characters long');
     }
 
-    // Hash password before storing
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -57,23 +57,27 @@ export function findUserByEmail(email) {
 }
 
 export async function verifyUserCredentials(email, password) {
-    if (!email || !password) {
-        return null;
+    if (!email || !email.trim()) {
+        throw new Error('Email is required');
+    }
+    if (!password || !password.trim()) {
+        throw new Error('Password is required');
     }
 
-    const user = findUserByEmail(email);
+    const user = findUserByEmail(email.trim());
     if (!user) {
-        return null;
+        throw new Error('Invalid email or password');
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-        return null;
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new Error('Invalid email or password');
     }
 
     return {
         id: user.id,
         email: user.email,
-        createdAt: user.created_at
+        createdAt: user.createdAt
     };
 }
+

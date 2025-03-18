@@ -7,8 +7,9 @@ export function initializeDatabase() {
         return db;
     }
     
-    db = new Database ('./database.sqlite', { verbose: console.log });
+    db = new Database('./database.sqlite', { verbose: console.log });
 
+    // Create users table
     db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY,
@@ -16,6 +17,18 @@ export function initializeDatabase() {
       password TEXT
     );
     `);
+
+    // Create events table
+    db.exec(`
+    CREATE TABLE IF NOT EXISTS events (
+        id INTEGER PRIMARY KEY,
+        dataTransferItemList TEXT,
+        description TEXT,
+        address TEXT,
+        date TEXT
+    );
+    `);
+
     return db;
 }   
 
@@ -24,6 +37,6 @@ export function getDatabase() {
       throw new Error('Database not initialized. Call initializeDatabase() first.');
     }
     return db;
-  }
+}
 
 
